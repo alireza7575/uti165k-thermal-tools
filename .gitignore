@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+thermal_output/
+thermal*.bmp
+thermal.webp
+body_temp_cam.csv

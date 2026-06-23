@@ -1,14 +1,15 @@
 # UTI165 Thermal Imager
 
-Python experiments for reading image and temperature data from a UTI165K thermal camera. The repository includes a live OpenCV viewer and an offline parser for captured frame data.
+Python tools for reading image and experimental temperature data from a UTI165K thermal camera. The repository includes a live OpenCV viewer and an offline converter for captured frame data.
 
 ![UTI165 thermal camera output](https://user-images.githubusercontent.com/41507280/111019189-93d0e100-83f8-11eb-9022-e84d079466f9.png)
 
 ## Repository Contents
 
-- `opencv_uti165k.py` - Opens the thermal camera with OpenCV, displays the video stream, detects faces, and reads an experimental temperature value from the raw frame data.
-- `raw_thermal.py` - Parses captured frame data and exports thermal images as BMP files plus an animated `thermal.webp`.
+- `opencv_uti165k.py` - Opens the thermal camera with OpenCV, displays the video stream, optionally detects faces, and reads an experimental temperature value from the raw frame data.
+- `raw_thermal.py` - Parses CSV frame data and exports thermal images as BMP files plus an animated WebP.
 - `uti165k capture.tdc` - Sample capture file kept for reference.
+- `requirements.txt` - Python package dependencies.
 
 ## Requirements
 
@@ -21,7 +22,7 @@ Python experiments for reading image and temperature data from a UTI165K thermal
 Install the Python packages:
 
 ```bash
-pip install opencv-python numpy pillow
+pip install -r requirements.txt
 ```
 
 On Linux, make sure the current user has permission to access video devices such as `/dev/video0`.
@@ -38,12 +39,19 @@ The script tries camera indexes `0` through `5`, configures the camera at `240 x
 
 Press `q` to close the viewer.
 
+Useful options:
+
+```bash
+python opencv_uti165k.py --first-camera 0 --last-camera 5 --width 240 --height 321
+python opencv_uti165k.py --face-cascade /path/to/haarcascade_frontalface_default.xml
+```
+
 ## Offline Frame Conversion
 
-`raw_thermal.py` expects a CSV capture named `body_temp_cam.csv` in the working directory. It reads frame data from the CSV, converts the YUV frame bytes to RGB, and writes:
+`raw_thermal.py` expects a CSV capture with a `Data` column containing hex frame bytes. By default it looks for `body_temp_cam.csv` and writes output to `thermal_output/`.
 
-- `thermal001.bmp`, `thermal002.bmp`, etc.
-- `thermal.webp`
+- `thermal_output/thermal001.bmp`, `thermal_output/thermal002.bmp`, etc.
+- `thermal_output/thermal.webp`
 
 Run it with:
 
@@ -51,11 +59,17 @@ Run it with:
 python raw_thermal.py
 ```
 
+You can also choose the input file and output directory:
+
+```bash
+python raw_thermal.py capture.csv --output-dir output
+```
+
 ## Notes
 
 - Temperature calculation is experimental and depends on how the UTI165K encodes raw frame metadata.
-- `opencv_uti165k.py` contains ROS Kinetic path handling for an older Linux/ROS environment. If you are not using ROS Kinetic, remove or adjust those `sys.path` lines.
-- The face detection path points to the common Linux OpenCV Haar cascade location: `/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml`.
+- `opencv_uti165k.py` contains compatibility handling for older ROS Kinetic environments where Python 2 ROS paths can interfere with Python 3 OpenCV imports.
+- The default face detection path points to the common Linux OpenCV Haar cascade location: `/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml`. If the file is missing, face detection is disabled and the thermal viewer still runs.
 
 ## Author
 
