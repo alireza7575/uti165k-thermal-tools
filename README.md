@@ -1,4 +1,4 @@
-# UTI165 Thermal Imager
+# UTI165K Thermal Tools
 
 Python tools for reading image and experimental temperature data from a UTI165K thermal camera. The repository includes a live OpenCV viewer and an offline converter for captured frame data.
 
